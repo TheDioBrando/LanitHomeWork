@@ -3,9 +3,9 @@ using System.Data.SqlClient;
 
 namespace HW3.Menues.Database
 {
-    public class Libraries:ITable, IOption
+    public class Libraries : ITable, IOption
     {
-        public string OptionName { get => "Libraries"; }
+        public string OptionName => "Libraries";
 
         public void Run()
         {
@@ -20,17 +20,18 @@ namespace HW3.Menues.Database
             string address = Console.ReadLine();
 
             string query = @$"insert into Libraries values ('{address}') ";
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
                     ConsoleHelper.WriteError(e.Message);
                 }
             }
+
             connection.Close();
         }
 
@@ -51,11 +52,11 @@ namespace HW3.Menues.Database
                 query = $"delete from Libraries where address='{addressForDelete}'";
             }
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
@@ -86,11 +87,11 @@ namespace HW3.Menues.Database
                 query = $"update Libraries set name = '{newAddress}' where name='{addressForUpdate}'";
             }
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
@@ -106,16 +107,14 @@ namespace HW3.Menues.Database
             connection.Open();
             string query = @"Select * from Libraries";
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            using (SqlDataReader read = command.ExecuteReader())
             {
                 try
                 {
-                    using (SqlDataReader read = comm.ExecuteReader())
+                    while (read.Read())
                     {
-                        while (read.Read())
-                        {
-                            Console.WriteLine($"{read["address"]} ");
-                        }
+                        Console.WriteLine($"{read["address"]} ");
                     }
                 }
                 catch (Exception e)

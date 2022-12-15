@@ -4,7 +4,7 @@ namespace HW3.Menues.Database
 {
     public class User : ITable, IOption
     {
-        public string OptionName { get => "User"; }
+        public string OptionName => "User";
 
         public void Run()
         {
@@ -19,11 +19,11 @@ namespace HW3.Menues.Database
             string name = Console.ReadLine();
 
             string query = @$"insert into Users values ('{name}') ";
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch(Exception e)
                 {
@@ -50,11 +50,11 @@ namespace HW3.Menues.Database
                 query = $"delete from Users where name='{nameForDelete}'";
             }
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
@@ -85,11 +85,11 @@ namespace HW3.Menues.Database
                 query = $"update Users set name = '{newName}' where name='{nameForUpdate}'";
             }
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
@@ -105,19 +105,17 @@ namespace HW3.Menues.Database
             connection.Open();
             string query = @"Select * from Users";
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            using (SqlDataReader read = command.ExecuteReader())
             {
                 try
                 {
-                    using (SqlDataReader read = comm.ExecuteReader())
+                    while (read.Read())
                     {
-                        while (read.Read())
-                        {
-                            Console.WriteLine($"{read["name"]} ");
-                        }
+                        Console.WriteLine($"{read["name"]} ");
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     ConsoleHelper.WriteError(e.Message);
                 }

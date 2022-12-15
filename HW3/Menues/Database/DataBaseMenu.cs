@@ -4,16 +4,16 @@ namespace HW3.Menues.Database
 {
     public class DataBaseMenu : Menu, IOption
     {
-        private const string connectionString = @"Server=Uvarov;Database=Libs;Trusted_Connection=True";
+        private const string CONNECTION_STRING = @"Server=Uvarov;Database=Libs;Trusted_Connection=True"; // You should name const with first capitalize letter (e.x. CONNECTION_STRING) or UPPER_CASE (e.x. CONNECTION_STRING)
         private SqlConnection _connection;
         private ITable table;
 
         public DataBaseMenu(List<IOption> options) : base(options)
         {
-            _connection = new SqlConnection(connectionString);
+            _connection = new SqlConnection(CONNECTION_STRING);
         }
 
-        public string OptionName { get => "Database"; }
+        public string OptionName => "Database";
 
         protected override void SelectMenuItem()
         {
@@ -47,18 +47,19 @@ namespace HW3.Menues.Database
             ShowCommands();
         }
 
-        public void ShowCommands()
+        private void ShowCommands()
         {
-            ConsoleHelper.WriteMenu($"Select menu item: \n" +
-               $"1) Insert;\n" +
-               $"2) Read;\n" +
-               $"3) Update;\n" +
-               $"4) Delete; \n" +
-               $"5) Exit");
+            ConsoleHelper.WriteMenu("Select menu item: \n" + // You don't need interpolation here ($)
+               "1) Insert;\n" +
+               "2) Read;\n" +
+               "3) Update;\n" +
+               "4) Delete; \n" +
+               "5) Exit");
+
             SelectCommand();
         }
 
-        public void SelectCommand()
+        private void SelectCommand()
         {
             char choice = Console.ReadKey().KeyChar;
 
