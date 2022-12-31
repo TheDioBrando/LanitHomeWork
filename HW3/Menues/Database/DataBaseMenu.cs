@@ -4,7 +4,7 @@ namespace HW3.Menues.Database
 {
     public class DataBaseMenu : Menu, IOption
     {
-        private const string CONNECTION_STRING = @"Server=Uvarov;Database=Libs;Trusted_Connection=True"; // You should name const with first capitalize letter (e.x. CONNECTION_STRING) or UPPER_CASE (e.x. CONNECTION_STRING)
+        private const string CONNECTION_STRING = @"Server=Uvarov;Database=Libs;Trusted_Connection=True"; 
         private SqlConnection _connection;
         private ITable table;
 
@@ -49,7 +49,7 @@ namespace HW3.Menues.Database
 
         private void ShowCommands()
         {
-            ConsoleHelper.WriteMenu("Select menu item: \n" + // You don't need interpolation here ($)
+            ConsoleHelper.WriteMenu("Select menu item: \n" +
                "1) Insert;\n" +
                "2) Read;\n" +
                "3) Update;\n" +

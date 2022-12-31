@@ -15,23 +15,9 @@ namespace HW3.Menues.Database
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter user id");
-            string input = Console.ReadLine();
-            if (!int.TryParse(input, out int userId) && userId > 0)
-            {
-                ConsoleHelper.WriteError("Enter correct number > 0");
-                input = Console.ReadLine();
-            }
+            (int userId, int bookId) = ReceiceInputForCreate();
 
-            ConsoleHelper.WriteService("Enter book id");
-            input = Console.ReadLine();
-            if (!int.TryParse(input, out int bookId) && bookId > 0) // it seems like broken logic. If we can parse number, we won't check the id > 0. If we cannot parse number, then we check if int default > 0. 
-            { // may be here is should be 'while' instead of 'if' ?
-                ConsoleHelper.WriteError("Enter correct number > 0");
-                input = Console.ReadLine();
-            }
-
-            string query = @$"insert into Orders values ({userId}, {bookId}) ";
+            string query = @$"INSERT INTO Orders VALUES ({userId}, {bookId}) ";
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
@@ -47,19 +33,36 @@ namespace HW3.Menues.Database
             connection.Close();
         }
 
-        public void Delete(SqlConnection connection)
+        private (int, int) ReceiceInputForCreate()
         {
-            connection.Open();
-
-            ConsoleHelper.WriteService("Enter userid for delete");
+            ConsoleHelper.WriteService("Enter user id");
             string input = Console.ReadLine();
-            if (!int.TryParse(input, out int id) && id > 0) // it seems like broken logic. If we can parse number, we won't check the id > 0. If we cannot parse number, then we check if int default > 0. 
-            { // may be here is should be 'while' instead of 'if' ?
+            int userId;
+            while (!int.TryParse(input, out userId) && userId > 0)
+            {
                 ConsoleHelper.WriteError("Enter correct number > 0");
                 input = Console.ReadLine();
             }
 
-            string query = $"delete from Orders where userID = {id}";
+            ConsoleHelper.WriteService("Enter book id");
+            input = Console.ReadLine();
+            int bookId;
+            while (!int.TryParse(input, out bookId) && bookId > 0)
+            {
+                ConsoleHelper.WriteError("Enter correct number > 0");
+                input = Console.ReadLine();
+            }
+
+            return (userId, bookId);
+        }
+
+        public void Delete(SqlConnection connection)
+        {
+            connection.Open();
+
+            int id = ReceiveInputForDelete();
+
+            string query = $"DELETE FROM Orders WHERE userID = {id}";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
@@ -74,6 +77,20 @@ namespace HW3.Menues.Database
             }
 
             connection.Close();
+        }
+
+        private int ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter userid for delete");
+            string input = Console.ReadLine();
+            int id;
+            while (!int.TryParse(input, out id) && id > 0)
+            {
+                ConsoleHelper.WriteError("Enter correct number > 0");
+                input = Console.ReadLine();
+            }
+
+            return id;
         }
 
         public void Update(SqlConnection connection)
@@ -84,7 +101,7 @@ namespace HW3.Menues.Database
         public void Read(SqlConnection connection)
         {
             connection.Open();
-            string query = @"Select * from Orders";
+            string query = @"SELECT * FROM Orders";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             using (SqlDataReader read = command.ExecuteReader())

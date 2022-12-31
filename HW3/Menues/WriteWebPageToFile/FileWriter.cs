@@ -2,14 +2,14 @@
 {
     internal class FileWriter : IOption
     {
-        public string OptionName { get => "Write web page to file"; }
+        public string OptionName => "Write web page to file";
 
         public void Run()
         {
             ExecuteWriteFromWebPage();
         }
 
-        private static async void ExecuteWriteFromWebPage()
+        private static void ExecuteWriteFromWebPage()
         {
             Console.Clear();
 

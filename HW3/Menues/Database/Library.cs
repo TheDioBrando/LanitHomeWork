@@ -16,10 +16,7 @@ namespace HW3.Menues.Database
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter address");
-            string address = Console.ReadLine();
-
-            string query = @$"insert into Libraries values ('{address}') ";
+            string query = $"INSERT INTO Libraries VALUES ('{ReceiveInputForCreate()}') ";
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
@@ -33,24 +30,25 @@ namespace HW3.Menues.Database
             }
 
             connection.Close();
+        }
+
+        private string ReceiveInputForCreate()
+        {
+            ConsoleHelper.WriteService("Enter address");
+            string address = Console.ReadLine();
+
+            return address;
         }
 
         public void Delete(SqlConnection connection)
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter address for delete \n or leave empty for delete all rows");
-            string addressForDelete = Console.ReadLine();
+            var addressForDelete = ReceiveInputForDelete();
 
-            string query;
-            if (string.IsNullOrEmpty(addressForDelete))
-            {
-                query = $"delete from Libraries";
-            }
-            else
-            {
-                query = $"delete from Libraries where address='{addressForDelete}'";
-            }
+            string query = string.IsNullOrEmpty(addressForDelete)?
+                $"DELETE FROM Libraries":
+                $"DELETE FROM Libraries WHERE address='{addressForDelete}'";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
@@ -65,27 +63,25 @@ namespace HW3.Menues.Database
             }
 
             connection.Close();
+        }
+
+        private string ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter address for delete \n or leave empty for delete all rows");
+            string addressForDelete = Console.ReadLine();
+
+            return addressForDelete;
         }
 
         public void Update(SqlConnection connection)
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter address for update \n or leave empty for update all rows");
-            string addressForUpdate = Console.ReadLine();
+            (string addressForUpdate, string newAddress) = ReceiveInputForUpdate();
 
-            ConsoleHelper.WriteService("Enter new name");
-            string newAddress = Console.ReadLine();
-
-            string query;
-            if (string.IsNullOrEmpty(addressForUpdate))
-            {
-                query = $"update Libraries set name='{newAddress}'";
-            }
-            else
-            {
-                query = $"update Libraries set name = '{newAddress}' where name='{addressForUpdate}'";
-            }
+            string query=string.IsNullOrEmpty(addressForUpdate)?
+                $"UPDATE Libraries SET name='{newAddress}'":
+                $"UPDATE Libraries SET name = '{newAddress}' WHERE  name='{addressForUpdate}'";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
@@ -102,10 +98,21 @@ namespace HW3.Menues.Database
             connection.Close();
         }
 
+        private (string,string) ReceiveInputForUpdate()
+        {
+            ConsoleHelper.WriteService("Enter address for update \n or leave empty for update all rows");
+            string addressForUpdate = Console.ReadLine();
+
+            ConsoleHelper.WriteService("Enter new name");
+            string newAddress = Console.ReadLine();
+
+            return (addressForUpdate, newAddress);
+        }
+
         public void Read(SqlConnection connection)
         {
             connection.Open();
-            string query = @"Select * from Libraries";
+            string query = "SELECT * FROM Libraries";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             using (SqlDataReader read = command.ExecuteReader())

@@ -16,18 +16,9 @@ namespace HW3.Menues.Database
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter book's name");
-            string name = Console.ReadLine();
+            (string name, int id) = ReceiveInputForCreate();
 
-            ConsoleHelper.WriteService("Enter library of the book");
-            string input = Console.ReadLine();
-            if(!int.TryParse(input, out int id) && id > 0) // it seems like broken logic. If we can parse number, we won't check the id > 0. If we cannot parse number, then we check if int default > 0. 
-            { // may be here is should be 'while' instead of 'if' ?
-                ConsoleHelper.WriteError("Enter correct number > 0");
-                input = Console.ReadLine();
-            }
-
-            string query = @$"insert into Books values ('{name}', {id}) ";
+            string query = @$"INSERT INTO Books VALUES ('{name}', {id}) ";
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
@@ -40,24 +31,34 @@ namespace HW3.Menues.Database
                 }
             }
             connection.Close();
+        }
+
+        private (string, int) ReceiveInputForCreate()
+        {
+            ConsoleHelper.WriteService("Enter book's name");
+            string name = Console.ReadLine();
+
+            ConsoleHelper.WriteService("Enter library's id of the book");
+            string input = Console.ReadLine();
+            int id;
+            while (!int.TryParse(input, out id) && id > 0)
+            {
+                ConsoleHelper.WriteError("Enter correct number > 0");
+                input = Console.ReadLine();
+            }
+
+            return (name, id);
         }
 
         public void Delete(SqlConnection connection)
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter name for delete \n or leave empty for delete all rows");
-            string nameForDelete = Console.ReadLine();
+            string nameForDelete = ReceiveInputForDelete();
 
-            string query;
-            if (string.IsNullOrEmpty(nameForDelete)) // can be shorter, using ?: ternary operator
-            {
-                query = $"delete from Books";
-            }
-            else
-            {
-                query = $"delete from Books where name='{nameForDelete}'";
-            }
+            string query = string.IsNullOrEmpty(nameForDelete) ? 
+                "DELETE FROM Books" :
+                $"DELETE FROM Books WHERE name='{nameForDelete}'";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
@@ -72,27 +73,25 @@ namespace HW3.Menues.Database
             }
 
             connection.Close();
+        }
+
+        private string ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter name for delete \n or leave empty for delete all rows");
+            string nameForDelete = Console.ReadLine();
+
+            return nameForDelete;
         }
 
         public void Update(SqlConnection connection)
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter name for update \n or leave empty for update all rows");
-            string nameForUpdate = Console.ReadLine();
+            (string nameForUpdate, string newName) = ReceiveInputForUpdate();
 
-            ConsoleHelper.WriteService("Enter new name");
-            string newName = Console.ReadLine();
-
-            string query;
-            if (string.IsNullOrEmpty(nameForUpdate))
-            {
-                query = $"update Books set name='{newName}'";
-            }
-            else
-            {
-                query = $"update Books set name = '{newName}' where name='{nameForUpdate}'";
-            }
+            string query = string.IsNullOrWhiteSpace(nameForUpdate) ?
+                $"UPDATE Books SET name='{newName}'" :
+                $"UPDATE Books SET name = '{newName}' where name='{nameForUpdate}'";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {
@@ -109,13 +108,24 @@ namespace HW3.Menues.Database
             connection.Close();
         }
 
+        private (string, string) ReceiveInputForUpdate()
+        {
+            ConsoleHelper.WriteService("Enter name for update \n or leave empty for update all rows");
+            string nameForUpdate = Console.ReadLine();
+
+            ConsoleHelper.WriteService("Enter new name");
+            string newName = Console.ReadLine();
+
+            return (nameForUpdate, newName);
+        }
+
         public void Read(SqlConnection connection)
         {
             connection.Open();
-            string query = @"select * from Books"; // You should write all commands low-case or UPPER-CASE
+            string query = @"SELECT * FROM Books"; 
 
             using (SqlCommand comm = new SqlCommand(query, connection))
-            using (SqlDataReader read = comm.ExecuteReader()) // There was too many deep of brackets. Now it's prettier 
+            using (SqlDataReader read = comm.ExecuteReader()) 
             {
                 try
                 {
