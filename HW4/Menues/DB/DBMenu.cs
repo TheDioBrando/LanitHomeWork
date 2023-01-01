@@ -1,19 +1,21 @@
-﻿using System.Data.SqlClient;
+﻿
+using ConsoleManagement;
+using HW4.Data;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace HW3.Menues.Database
+namespace HW4.Menues.DB
 {
-    public class DataBaseMenu : Menu, IOption
+    public class DBMenu : Menu, IOption
     {
-        private const string connectionString = @"Server=Uvarov;Database=Libs;Trusted_Connection=True";
-        private SqlConnection _connection;
-        private ITable table;
+        private readonly LibContext _context;
+        private IController _controller;
 
-        public DataBaseMenu(List<IOption> options) : base(options)
+        public DBMenu(List<IOption> options, LibContext context) : base(options)
         {
-            _connection = new SqlConnection(connectionString);
+            _context = context;
         }
 
-        public string OptionName => "Database"; 
+        public string OptionName => "DataBase";
 
         protected override void SelectMenuItem()
         {
@@ -28,16 +30,16 @@ namespace HW3.Menues.Database
             switch (choice)
             {
                 case '1':
-                    table = new User();
+                    _controller = new UserController();
                     break;
                 case '2':
-                    table = new Books();
+                    _controller = new BookController();
                     break;
                 case '3':
-                    table = new Libraries();
+                    _controller = new LibraryController();
                     break;
                 case '4':
-                    table = new Orders();
+                    _controller = new OrderController();
                     break;
                 case '5':
                     _active = false;
@@ -71,20 +73,28 @@ namespace HW3.Menues.Database
             switch (choice)
             {
                 case '1':
-                    table.Create(_connection);
+                    _controller.Create(_context);
                     break;
                 case '2':
-                    table.Read(_connection);
+                    _controller.Read(_context);
                     break;
                 case '3':
-                    table.Update(_connection);
+                    _controller.Update(_context);
                     break;
                 case '4':
-                    table.Delete(_connection);
+                    _controller.Delete(_context);
                     break;
                 case '5':
-                    _active = false;
                     return;
+            }
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                ConsoleHelper.WriteError(e.Message);
             }
         }
     }

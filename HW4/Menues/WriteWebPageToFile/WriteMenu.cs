@@ -1,4 +1,4 @@
-﻿namespace HW3.Menues.WriteWebPageToFile
+﻿namespace HW4.Menues.WriteWebPageToFile
 {
     internal class WriteMenu : Menu, IOption
     {
