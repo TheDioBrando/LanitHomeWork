@@ -4,14 +4,9 @@ using HW4.Models;
 
 namespace HW4.Menues.DB
 {
-    internal class UserController : IController, IOption
+    internal class UserCommand : ICommand, IOption
     {
         public string OptionName => "User";
-
-        public void Create(LibContext context)
-        {
-            context.Users.Add(ReceiveInputForCreate());
-        }
 
         private DbUsers ReceiveInputForCreate()
         {
@@ -19,12 +14,34 @@ namespace HW4.Menues.DB
             string name = Console.ReadLine();
             return new DbUsers
             {
-                Id=Guid.NewGuid(),
-                Name=name
+                Id = Guid.NewGuid(),
+                Name = name
             };
         }
 
-        public void Delete(LibContext context)
+        private string ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter name for delete");
+            return Console.ReadLine();
+        }
+
+        private (string, string) ReceiveInputForUpdate()
+        {
+            ConsoleHelper.WriteService("Enter name for update");
+            string nameForUpdate = Console.ReadLine();
+
+            ConsoleHelper.WriteService("Enter new name");
+            string newName = Console.ReadLine();
+
+            return (nameForUpdate, newName);
+        }
+
+        public void Create(LibDbContext context)
+        {
+            context.Users.Add(ReceiveInputForCreate());
+        }
+
+        public void Delete(LibDbContext context)
         {
             string name = ReceiveInputForDelete();
             var user = context.Users.FirstOrDefault(u => u.Name == name); 
@@ -38,24 +55,20 @@ namespace HW4.Menues.DB
             context.Users.Remove(user);
         }
 
-        private string ReceiveInputForDelete()
-        {
-            ConsoleHelper.WriteService("Enter name for delete");
-            return Console.ReadLine();
-        }
-
-        public void Read(LibContext context)
+        public void Read(LibDbContext context)
         {
             var users = context.Users.ToList();
 
             foreach (var user in users)
+            {
                 ConsoleHelper.WriteResult(String.Join(',', user.Id, user.Name));
+            }
 
             ConsoleHelper.WriteService("Tap anything");
             Console.ReadKey();
         }
 
-        public void Update(LibContext context)
+        public void Update(LibDbContext context)
         {
             (string nameForUpdate, string newName) = ReceiveInputForUpdate();
             var user = context.Users.FirstOrDefault(u => u.Name == nameForUpdate);
@@ -67,17 +80,6 @@ namespace HW4.Menues.DB
             }
 
             user.Name = newName;
-        }
-
-        private (string, string) ReceiveInputForUpdate()
-        {
-            ConsoleHelper.WriteService("Enter name for update");
-            string nameForUpdate = Console.ReadLine();
-
-            ConsoleHelper.WriteService("Enter new name");
-            string newName = Console.ReadLine();
-
-            return (nameForUpdate, newName);
         }
 
         public void Run()

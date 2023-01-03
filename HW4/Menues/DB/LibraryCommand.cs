@@ -4,14 +4,9 @@ using HW4.Models;
 
 namespace HW4.Menues.DB
 {
-    internal class LibraryController : IController, IOption
+    internal class LibraryCommand : ICommand, IOption
     {
         public string OptionName => "Library";
-
-        public void Create(LibContext context)
-        {
-            context.Libraries.Add(ReceiveInputForCreate());
-        }
 
         private DbLibraries ReceiveInputForCreate()
         {
@@ -25,7 +20,29 @@ namespace HW4.Menues.DB
             };
         }
 
-        public void Delete(LibContext context)
+        private string ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter address for delete");
+            return Console.ReadLine();
+        }
+
+        private (string, string) ReceiveInputForUpdate()
+        {
+            ConsoleHelper.WriteService("Enter address for update");
+            string addressForUpdate = Console.ReadLine();
+
+            ConsoleHelper.WriteService("Enter new address");
+            string newAddress = Console.ReadLine();
+
+            return (addressForUpdate, newAddress);
+        }
+
+        public void Create(LibDbContext context)
+        {
+            context.Libraries.Add(ReceiveInputForCreate());
+        }
+
+        public void Delete(LibDbContext context)
         {
             var lib = context.Libraries.FirstOrDefault(l => l.Address == ReceiveInputForDelete());
 
@@ -38,24 +55,20 @@ namespace HW4.Menues.DB
             context.Libraries.Remove(lib);
         }
 
-        private string ReceiveInputForDelete()
-        {
-            ConsoleHelper.WriteService("Enter address for delete");
-            return Console.ReadLine();
-        }
-
-        public void Read(LibContext context)
+        public void Read(LibDbContext context)
         {
             var libs = context.Libraries.ToList();
 
             foreach (var lib in libs)
+            {
                 Console.WriteLine(String.Join(',', lib.Id, lib.Address));
+            }
 
             ConsoleHelper.WriteService("Tap anything");
             Console.ReadKey();
         }
 
-        public void Update(LibContext context)
+        public void Update(LibDbContext context)
         {
             (string addressForUpdate, string newAddress) = ReceiveInputForUpdate();
             var lib = context.Libraries.FirstOrDefault(l => l.Address == addressForUpdate);
@@ -66,18 +79,7 @@ namespace HW4.Menues.DB
                 return;
             }
 
-            lib.Address=newAddress;
-        }
-
-        private (string,string) ReceiveInputForUpdate()
-        {
-            ConsoleHelper.WriteService("Enter address for update");
-            string addressForUpdate = Console.ReadLine();
-
-            ConsoleHelper.WriteService("Enter new address");
-            string newAddress = Console.ReadLine();
-
-            return (addressForUpdate, newAddress);
+            lib.Address = newAddress;
         }
 
         public void Run()

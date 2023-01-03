@@ -4,14 +4,9 @@ using HW4.Models;
 
 namespace HW4.Menues.DB
 {
-    internal class BookController : IController, IOption
+    internal class BookCommand : ICommand, IOption
     {
         public string OptionName => "Book";
-
-        public void Create(LibContext context)
-        {
-            context.Books.Add(ReceiveInputForCreate());
-        }
 
         private DbBooks ReceiveInputForCreate()
         {
@@ -34,7 +29,31 @@ namespace HW4.Menues.DB
             };
         }
 
-        public void Delete(LibContext context)
+        private string ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter name for delete");
+            string nameForDelete = Console.ReadLine();
+
+            return nameForDelete;
+        }
+
+        private (string, string) ReceiveInputForUpdate()
+        {
+            ConsoleHelper.WriteService("Enter name for update");
+            string nameForUpdate = Console.ReadLine();
+
+            ConsoleHelper.WriteService("Enter new name");
+            string newName = Console.ReadLine();
+
+            return (nameForUpdate, newName);
+        }
+
+        public void Create(LibDbContext context)
+        {
+            context.Books.Add(ReceiveInputForCreate());
+        }
+
+        public void Delete(LibDbContext context)
         {
             var book = context.Books.FirstOrDefault(b => b.Title == ReceiveInputForDelete());
 
@@ -47,26 +66,20 @@ namespace HW4.Menues.DB
             context.Books.Remove(book);
         }
 
-        private string ReceiveInputForDelete ()
-        {
-            ConsoleHelper.WriteService("Enter name for delete");
-            string nameForDelete = Console.ReadLine();
-
-            return nameForDelete;
-        }
-
-        public void Read(LibContext context)
+        public void Read(LibDbContext context)
         {
             var books = context.Books.ToList();
 
             foreach (var book in books)
+            {
                 Console.WriteLine(String.Join(';', book.Id, book.Title, book.LibraryId));
+            }
 
             ConsoleHelper.WriteService("Tap anything");
             Console.ReadKey();
         }
 
-        public void Update(LibContext context)
+        public void Update(LibDbContext context)
         {
             (string nameForUpdate, string newName) = ReceiveInputForUpdate();
 
@@ -79,17 +92,6 @@ namespace HW4.Menues.DB
             }
 
             book.Title = newName;
-        }
-
-        private (string, string) ReceiveInputForUpdate()
-        {
-            ConsoleHelper.WriteService("Enter name for update");
-            string nameForUpdate = Console.ReadLine();
-
-            ConsoleHelper.WriteService("Enter new name");
-            string newName = Console.ReadLine();
-
-            return (nameForUpdate, newName);
         }
 
         public void Run()

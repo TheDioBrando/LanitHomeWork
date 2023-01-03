@@ -6,8 +6,6 @@ namespace HW4.Menues.Fibonacci
     {
         public string OptionName { get => "Calculate number"; }
 
-
-
         public void Run()
         {
             ExecuteFibonacci();

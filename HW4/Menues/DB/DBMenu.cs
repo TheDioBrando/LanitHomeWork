@@ -7,12 +7,10 @@ namespace HW4.Menues.DB
 {
     public class DBMenu : Menu, IOption
     {
-        private readonly LibContext _context;
-        private IController _controller;
+        private ICommand _controller;
 
-        public DBMenu(List<IOption> options, LibContext context) : base(options)
+        public DBMenu(List<IOption> options) : base(options)
         {
-            _context = context;
         }
 
         public string OptionName => "DataBase";
@@ -30,16 +28,16 @@ namespace HW4.Menues.DB
             switch (choice)
             {
                 case '1':
-                    _controller = new UserController();
+                    _controller = new UserCommand();
                     break;
                 case '2':
-                    _controller = new BookController();
+                    _controller = new BookCommand();
                     break;
                 case '3':
-                    _controller = new LibraryController();
+                    _controller = new LibraryCommand();
                     break;
                 case '4':
-                    _controller = new OrderController();
+                    _controller = new OrderCommand();
                     break;
                 case '5':
                     _active = false;
@@ -69,32 +67,34 @@ namespace HW4.Menues.DB
                 ConsoleHelper.WriteError(" Write correct menu item");
                 choice = Console.ReadKey().KeyChar;
             }
+            using (LibDbContext context = new())
+            {
+                switch (choice)
+                {
+                    case '1':
+                        _controller.Create(context);
+                        break;
+                    case '2':
+                        _controller.Read(context);
+                        break;
+                    case '3':
+                        _controller.Update(context);
+                        break;
+                    case '4':
+                        _controller.Delete(context);
+                        break;
+                    case '5':
+                        return;
+                }
 
-            switch (choice)
-            {
-                case '1':
-                    _controller.Create(_context);
-                    break;
-                case '2':
-                    _controller.Read(_context);
-                    break;
-                case '3':
-                    _controller.Update(_context);
-                    break;
-                case '4':
-                    _controller.Delete(_context);
-                    break;
-                case '5':
-                    return;
-            }
-
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                ConsoleHelper.WriteError(e.Message);
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    ConsoleHelper.WriteError(e.Message);
+                }
             }
         }
     }

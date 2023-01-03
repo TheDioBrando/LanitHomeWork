@@ -12,21 +12,20 @@ namespace HW4
     {
         static void Main(string[] args)
         {
-
-            using (LibContext context = new LibContext())
+            using (LibDbContext context = new LibDbContext())
             {
                 context.Database.Migrate();
-                //var f = context.Libraries.Include(l => l.Books);
-
-                Menu menu = new MainMenu(new List<IOption>
-                {
-                    new ReadMenu( new List<IOption> { new FileReader() }),
-                    new WriteMenu( new List<IOption> { new FileWriter() }),
-                    new FibonacciMenu( new List<IOption> { new Fibonacci() }),
-                    new DBMenu( new List<IOption>{new UserController(), new BookController(), new LibraryController(), new OrderController()}, context)
-                });
-                menu.Run();
             }
+
+            Menu menu = new MainMenu(new List<IOption>
+            {
+                new ReadMenu( new List<IOption> { new FileReader() }),
+                new WriteMenu( new List<IOption> { new FileWriter() }),
+                new FibonacciMenu( new List<IOption> { new Fibonacci() }),
+                new DBMenu( new List<IOption>{new UserCommand(), new BookCommand(), new LibraryCommand(), new OrderCommand()})
+            });
+
+            menu.Run();
         }
     }
 }
