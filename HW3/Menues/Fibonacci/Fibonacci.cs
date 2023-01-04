@@ -2,7 +2,7 @@
 {
     internal class Fibonacci : IOption
     {
-        public string OptionName { get => "Calculate number"; }
+        public string OptionName => "Calculate number";
 
 
 

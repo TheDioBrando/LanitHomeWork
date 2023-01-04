@@ -2,7 +2,7 @@
 {
     internal class FileReader : IOption
     {
-        public string OptionName { get => "Read File"; }
+        public string OptionName => "Read File";
 
         public void Run()
         {
