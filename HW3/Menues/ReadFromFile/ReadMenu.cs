@@ -6,6 +6,6 @@
         {
         }
 
-        public string OptionName { get => "Read"; }
+        public string OptionName => "Read";
     }
 }

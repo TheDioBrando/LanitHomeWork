@@ -2,11 +2,11 @@
 
 namespace HW3.Menues.Database
 {
-    public class Orders:ITable, IOption
+    public class Orders : ITable, IOption
     {
-        public string OptionName { get => "Orders"; }
+        public string OptionName => "Orders";
 
-        public void Run()
+        public void Run() // This is not so good.. may be you need to refactor your architecture. But not necessary.
         {
             //nothing
         }
@@ -15,9 +15,30 @@ namespace HW3.Menues.Database
         {
             connection.Open();
 
+            (int userId, int bookId) = ReceiceInputForCreate();
+
+            string query = @$"INSERT INTO Orders VALUES ({userId}, {bookId}) ";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    ConsoleHelper.WriteError(e.Message);
+                }
+            }
+
+            connection.Close();
+        }
+
+        private (int, int) ReceiceInputForCreate()
+        {
             ConsoleHelper.WriteService("Enter user id");
             string input = Console.ReadLine();
-            if (!int.TryParse(input, out int userId) && userId > 0)
+            int userId;
+            while (!int.TryParse(input, out userId) && userId > 0)
             {
                 ConsoleHelper.WriteError("Enter correct number > 0");
                 input = Console.ReadLine();
@@ -25,47 +46,29 @@ namespace HW3.Menues.Database
 
             ConsoleHelper.WriteService("Enter book id");
             input = Console.ReadLine();
-            if (!int.TryParse(input, out int bookId) && bookId > 0)
+            int bookId;
+            while (!int.TryParse(input, out bookId) && bookId > 0)
             {
                 ConsoleHelper.WriteError("Enter correct number > 0");
                 input = Console.ReadLine();
             }
 
-            string query = @$"insert into Orders values ({userId}, {bookId}) ";
-            using (SqlCommand comm = new SqlCommand(query, connection))
-            {
-                try
-                {
-                    comm.ExecuteNonQuery();
-                }
-                catch (Exception e)
-                {
-                    ConsoleHelper.WriteError(e.Message);
-                }
-            }
-            connection.Close();
+            return (userId, bookId);
         }
 
         public void Delete(SqlConnection connection)
         {
             connection.Open();
 
-            ConsoleHelper.WriteService("Enter userid for delete");
-            string input = Console.ReadLine();
-            if (!int.TryParse(input, out int id) && id > 0)
-            {
-                ConsoleHelper.WriteError("Enter correct number > 0");
-                input = Console.ReadLine();
-            }
+            int id = ReceiveInputForDelete();
 
-            string query;
-            query = $"delete from Orders where userID = {id}";
+            string query = $"DELETE FROM Orders WHERE userID = {id}";
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 try
                 {
-                    comm.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception e)
                 {
@@ -74,6 +77,20 @@ namespace HW3.Menues.Database
             }
 
             connection.Close();
+        }
+
+        private int ReceiveInputForDelete()
+        {
+            ConsoleHelper.WriteService("Enter userid for delete");
+            string input = Console.ReadLine();
+            int id;
+            while (!int.TryParse(input, out id) && id > 0)
+            {
+                ConsoleHelper.WriteError("Enter correct number > 0");
+                input = Console.ReadLine();
+            }
+
+            return id;
         }
 
         public void Update(SqlConnection connection)
@@ -84,18 +101,16 @@ namespace HW3.Menues.Database
         public void Read(SqlConnection connection)
         {
             connection.Open();
-            string query = @"Select * from Orders";
+            string query = @"SELECT * FROM Orders";
 
-            using (SqlCommand comm = new SqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            using (SqlDataReader read = command.ExecuteReader())
             {
                 try
                 {
-                    using (SqlDataReader read = comm.ExecuteReader())
+                    while (read.Read())
                     {
-                        while (read.Read())
-                        {
-                            Console.WriteLine($"user:{read[0]} book:{read[1]}");
-                        }
+                        Console.WriteLine($"user:{read[0]} book:{read[1]}");
                     }
                 }
                 catch (Exception e)

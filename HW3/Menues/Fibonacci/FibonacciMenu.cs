@@ -6,6 +6,6 @@
         {
         }
 
-        public string OptionName { get => "Fibonacci number"; }
+        public string OptionName => "Fibonacci number";
     }
 }
