@@ -13,7 +13,7 @@ namespace HW3.Menues.Database
             _connection = new SqlConnection(CONNECTION_STRING);
         }
 
-        public string OptionName => "Database";
+        public string OptionName => "Database"; 
 
         protected override void SelectMenuItem()
         {
